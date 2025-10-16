@@ -1,34 +1,38 @@
-import { Box, Button, FormControl, TextField } from "@mui/material";
+import {Box, Button, FormControl, InputLabel, MenuItem, Select, TextField} from "@mui/material";
 import { useState } from "react";
 import { CardCustom } from "../Components/CardCustom";
 import { useMutationIngredientCreate } from "../Hooks/Mutation/IngredientsMutation";
+import { IngredientTagEnum } from "../Types/Ingredient";
 
 export function CreateIngredientForm(): JSX.Element {
   const { mutateAsync: createIngredient } = useMutationIngredientCreate();
 
   const [name, setName] = useState("");
   const [price, setPrice] = useState<number>(0);
+  const [tag, setTag] = useState<IngredientTagEnum | "">("");
 
   const resetFields = () => {
     setName("");
     setPrice(0);
+    setTag("");
   };
 
   const handlerSubmitNewIngredient = async () => {
-    if (name === undefined || name === "" || price === undefined) {
+    if (name === undefined || name === "" || price === undefined || tag === "") {
       alert("Please fill all the fields");
       return;
     }
     await createIngredient({
       name,
       price,
+      tag,
     });
 
     resetFields();
   };
 
   return (
-    <div id="create-recipes-form">
+    <div id="create-ingredient-form">
       <Box
         display="flex"
         justifyContent="space-between"
@@ -40,7 +44,7 @@ export function CreateIngredientForm(): JSX.Element {
             <TextField
               value={name}
               onChange={(e) => setName(e.target.value)}
-              id="name-recipe"
+              id="name-ingredient"
               label="Name of the ingredient"
               variant="outlined"
               fullWidth
@@ -52,7 +56,7 @@ export function CreateIngredientForm(): JSX.Element {
               onChange={(e) =>
                 e.target.value ? setPrice(Number(e.target.value)) : setPrice(0)
               }
-              id="name-recipe"
+              id="price-ingredient"
               label="price"
               variant="outlined"
               type="number"
@@ -63,7 +67,24 @@ export function CreateIngredientForm(): JSX.Element {
               multiplied by the number of people in the recipe.
             </span>
           </FormControl>
-
+          <FormControl fullWidth margin="normal">
+            <InputLabel
+                id="ingredient-tag-select-label">
+              Tag
+            </InputLabel>
+            <Select
+                labelId="ingredient-tag-select-label"
+                id="ingredient-tag-select"
+                value={tag}
+                onChange={(e) => setTag(e.target.value as IngredientTagEnum)}
+            >
+              {Object.values(IngredientTagEnum).map((tagValue) => (
+                  <MenuItem value={tagValue} key={tagValue}>
+                    {tagValue}
+                  </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <FormControl margin="normal">
             <Button onClick={handlerSubmitNewIngredient} variant="contained">
               Submit
