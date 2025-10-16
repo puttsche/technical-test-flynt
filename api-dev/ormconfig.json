@@ -14,7 +14,10 @@
     "logging": false,
     "entities": ["src/Entities/**/*.ts"],
     "migrations": ["src/migration/**/*.ts"],
-    "subscribers": ["src/subscriber/**/*.ts"]
+    "subscribers": ["src/subscriber/**/*.ts"],
+    "cli": {
+      "migrationsDir": "src/migration/dev"
+    }
   },
   {
     "environment": "test",
@@ -31,6 +34,9 @@
     "logging": false,
     "entities": ["src/Entities/**/*.ts"],
     "migrations": ["src/migration/dev/*.ts"],
-    "subscribers": ["src/subscriber/**/*.ts"]
+    "subscribers": ["src/subscriber/**/*.ts"],
+    "cli": {
+      "migrationsDir": "src/migration/dev"
+    }
   }
 ]
