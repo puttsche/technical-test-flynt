@@ -1,4 +1,7 @@
 import { RecipeService } from "../Services/RecipeService";
+import { NextFunction, Request, Response } from "express";
+import { CreateRecipe } from "../UseCase/Recipe/CreateRecipe";
+import { Recipe } from "../Entities/Recipe";
 
 export class RecipeController {
   public static async list(req: any, res: any, next: any): Promise<void> {
@@ -11,13 +14,18 @@ export class RecipeController {
     }
   }
 
-  public static async create(req: any, res: any, next: any): Promise<void> {
+  public static async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const recipe = await RecipeService.create(req.body);
+      const recipe: Recipe = await CreateRecipe.execute(req.body);
+
       res.send(recipe);
-    } catch (err) {
+    } catch (err: any) {
       console.error("[RecipeController.create] Error creating recipe", err);
-      res.send(500);
+
+      const status: any = err.statusCode || 500;
+      res.status(status).json({
+        message: err.message || "Unknown error."
+      });
     }
   }
 

@@ -13,6 +13,7 @@ import { useQueryIngredientList } from "../Hooks/Query/IngredientQuery";
 import { ErrorPage } from "../Pages/ErrorPage";
 import { Ingredient } from "../Types/Ingredient";
 import { OptionsMultiSelectType } from "../Types/OptionsMultiSelect";
+import { GetRecipeCriteria, RecipeCriteriaReturnType } from "../Helpers/GetRecipeCriteria";
 
 export function CreateRecipesForm(): JSX.Element {
   const [name, setName] = useState("");
@@ -37,14 +38,30 @@ export function CreateRecipesForm(): JSX.Element {
       return;
     }
 
-    await createRecipe({
-      name,
-      timeToCook,
-      numberOfPeople,
-      ingredients: selectedIngredients.map((e) => e.id),
-    });
+    const recipeCriteria: RecipeCriteriaReturnType = GetRecipeCriteria(selectedIngredients);
 
-    resetFields();
+    if (!recipeCriteria.proteine) {
+      alert("Please select at most one \"protéine\"");
+      return;
+    }
+
+    if(!recipeCriteria.feculent) {
+      alert("Please select one \"féculent\"");
+      return;
+    }
+
+    try {
+      await createRecipe({
+        name,
+        timeToCook,
+        numberOfPeople,
+        ingredients: selectedIngredients.map((e) => e.id),
+      });
+      resetFields();
+    } catch (error: any) {
+      const message = error?.response?.data?.message || "Error unknown.";
+      alert(message);
+    }
   };
 
   if (status === "error") {
@@ -83,7 +100,7 @@ export function CreateRecipesForm(): JSX.Element {
               multiple
               id="combo-box-demo"
               options={ingredients.map((e: Ingredient) => {
-                return { label: e.name, id: e.id };
+                return { label: e.name, id: e.id, tag: e.tag };
               })}
               renderInput={(params: any) => (
                 <TextField {...params} label="Ingredients" />
